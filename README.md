@@ -1,5 +1,5 @@
 # Alcoholic Detector
-In this project we try to find alcohol consumption and health status of a students from their social characteristics.
+In this project we try to find alcohol consumption and health status of students from their social characteristics.
 
 ## Pre-processing The Dataset
 The two dataset files those have been used in the project have been obtained from this [page][dataset] from [Kaggle][kaggle]. 
@@ -7,7 +7,7 @@ The two dataset files those have been used in the project have been obtained fro
 The dataset contains the following columns:
 
 1.  `school`: Student's school
-2.  `sex`: - Student's sex 
+2.  `sex`: Student's sex 
 3.  `age`: Student's age
 4.  `address`: Student's home address type
 5.  `famsize`: Family size
@@ -62,32 +62,32 @@ Tensors are multi-dimensional vectors like arrays and matrixes etc. In machine l
 For example we can encode `label` column in the following dataset:
 
 | index | value | label |
-|:-----:|:-----:|:-----:|
-|   1   |  45   | 'cat' |
-|   2   |  13   | 'dog' |
-|   3   |  42   | 'cat' |
-|   4   |  98   | 'rat' |
+| :---: | :---: | :---: |
+| 1     | 45    | 'cat' |
+| 2     | 13    | 'dog' |
+| 3     | 42    | 'cat' |
+| 4     | 98    | 'rat' |
 
 Wrong encoding:
 
 
-| index | value |   label   |
-|:-----:|:-----:|:---------:|
-|   1   |  45   | [1, 0, 0] |
-|   2   |  13   | [0, 1, 0] |
-|   3   |  42   | [1, 0, 0] |
-|   4   |  98   | [0, 0, 1] |
+| index | value | label     |
+| :---: | :---: | :-------: |
+| 1     | 45    | [1, 0, 0] |
+| 2     | 13    | [0, 1, 0] |
+| 3     | 42    | [1, 0, 0] |
+| 4     | 98    | [0, 0, 1] |
 
 
 Correct encoding:
 
 
 | index | value | labelcat | labeldog | labelrat |
-|:-----:|:-----:|:--------:|:--------:|:--------:|
-|   1   |  45   |     1    |     0    |    0     |    
-|   2   |  13   |     0    |     1    |    0     |
-|   3   |  42   |     1    |     0    |    0     |
-|   4   |  98   |     0    |     0    |    1     |
+| :---: | :---: | :------: | :------: | :------: |
+| 1     | 45    | 1        | 0        | 0        |
+| 2     | 13    | 0        | 1        | 0        |
+| 3     | 42    | 1        | 0        | 0        |
+| 4     | 98    | 0        | 0        | 1        |
 
 
 First, I used `pandas.get_dummies()` the result was enough for train but I faced another problem at test phase. When I created a dataframe for the test input, I noticed the column order of dataframe was changed after the dataframe to matrix conversion. So I decided to change the conversion method and do it manually row by row.
@@ -97,7 +97,15 @@ Simple, feed-forward neural network has been used in the project. The architectu
 
 `Input[45] > Hidden_1[100] > Hidden_2[100] > Output[2]`
 
+Learning rate is set to 0.001 and for this learning rate, number of epochs is set to 10000. Because of to be exposed to overfitting, more than 10000 cycles is unnecessary for this learning rate.
+
 Despite its simplicity, there was something wrong with the first teaching experiments. The error was decreasing a little and it was increasing continiously after it. I noticed that I was checking the error for test dataset. Then I added training error check. Voila! The error is decreasing for training set. So I realized that the network was exposed to overfitting. Overfitting problem can be solved with dropout layers. So I added a dropout layer after each hidden layer with probability of 0.5. After the dropout integration the network started to learn properly.
+
+### Training data errors:
+![Training errors](/outputs/test_errors.png)
+
+### Test data errors:
+![Test errors](/outputs/test_errors.png)
 
 ## Usage of TensorFlow Sessions
 After playing with TensorFlow a little bit, I learned a few things about TensorFlow sessions.
@@ -113,11 +121,11 @@ feed = {
     output_placeholder: training_outputs
 }
 
-#                         *Feed with this data*
-#                                   v
+#                                *Feed with this data*
+#                                          v
 training_cost = sess.run(cost, feed_dict=feed)
 #                         ^ 
-#           Evaluate and return this data
+#           *Evaluate and return this data*
 ```
 
 Cost and test values were fetched with this method in this project.
@@ -125,12 +133,12 @@ Cost and test values were fetched with this method in this project.
 ## Am I Alcoholic?
 The program has no UI so the result is displayed in the console. Now we have properly trained neural network. Unfortunately, I faced another problem. The test results are not stable. They gives different result for each evaluation. So I realized that I forget to deactivate dropout layers for testing. At last I disabled the dropout layers and neural network is good to go!
 
-The result formatted as:  
+The result is formatted as:  
 ```
-[
-    [Workday alcohol consumption (0-1)],
-    [Weekend alcohol consumption (0-1)]
-]
+[[
+    Workday alcohol consumption (0-1),
+    Weekend alcohol consumption (0-1)
+]]
 ```  
 
 Can it detect some alcoholics? Let's see...
